@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyMate · AI Study Assistant</title>
+    <!-- Font Awesome for icons (beginner friendly) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f6f9fc 0%, #eef2f7 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem 1rem;
+        }
+
+        .app-card {
+            max-width: 1000px;
+            width: 100%;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(4px);
+            border-radius: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 20, 40, 0.25);
+            padding: 2rem 2rem 2.5rem;
+            border: 1px solid rgba(255,255,255,0.5);
+            transition: 0.25s;
+        }
+
+        h1 {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            font-size: 2.1rem;
+            color: #0b2b44;
+            margin-bottom: 0.25rem;
+        }
+
+        h1 i {
+            color: #3a7bd5;
+            font-size: 2.2rem;
+        }
+
+        .subhead {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            border-bottom: 2px dashed #cbd5e1;
+            padding-bottom: 0.75rem;
+        }
+
+        .subhead p {
+            color: #2c3e50;
+            font-weight: 400;
+            font-size: 1rem;
+            background: #e8edf4;
+            padding: 0.3rem 1.2rem;
+            border-radius: 30px;
+            letter-spacing: 0.3px;
+        }
+
+        .subhead i {
+            margin-right: 6px;
+            color: #2c6b9e;
+        }
+
+        /* ------ input zone ------ */
+        .input-panel {
+            background: white;
+            border-radius: 28px;
+            padding: 1.6rem 1.8rem;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.03);
+            border: 1px solid #e9edf3;
+            margin-bottom: 2rem;
+        }
+
+        .input-panel label {
+            font-weight: 600;
+            color: #1e3a5f;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .input-panel textarea {
+            width: 100%;
+            border: 1px solid #d9e1ec;
+            border-radius: 20px;
+            padding: 1rem 1.2rem;
+            font-size: 0.95rem;
+            resize: vertical;
+            min-height: 90px;
+            background: #fafcff;
+            transition: 0.2s;
+            color: #0b2b44;
+        }
+
+        .input-panel textarea:focus {
+            outline: 2px solid #3a7bd5;
+            outline-offset: 2px;
+            border-color: transparent;
+            background: white;
+        }
+
+        .file-upload-area {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        .file-upload-area input[type="file"] {
+            font-size: 0.9rem;
+            background: #f0f5fe;
+            padding: 8px 16px;
+            border-radius: 60px;
+            border: 1px solid #b8cee8;
+            cursor: pointer;
+            color: #1f4a7a;
+        }
+
+        .file-upload-area input[type="file"]::file-selector-button {
+            background: #1f4a7a;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 6px 18px;
+            font-weight: 500;
+            margin-right: 14px;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+
+        .file-upload-area input[type="file"]::file-selector-button:hover {
+            background: #123a62;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .btn {
+            background: white;
+            border: 1px solid #cbdae9;
+            padding: 0.6rem 1.6rem;
+            border-radius: 60px;
+            font-weight: 500;
+            color: #1e3a5f;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            background: #f0f6fe;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .btn-primary {
+            background: #1f4a7a;
+            border: 1px solid #1f4a7a;
+            color: white;
+            box-shadow: 0 6px 12px rgba(26, 67, 113, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: #14355a;
+            transform: scale(0.98);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #9bb5d3;
+        }
+
+        .btn-outline:hover {
+            background: #e4edf9;
+        }
+
+        .btn i {
+            font-size: 1rem;
+        }
+
+        /* ----- output area (cards) ----- */
+        .output-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 1.2rem;
+        }
+
+        @media (max-width: 700px) {
+            .output-grid {
+                grid-template-columns: 1fr;
+                gap: 1.2rem;
+            }
+            .app-card { padding: 1.5rem; }
+        }
+
+        .card {
+            background: white;
+            border-radius: 28px;
+            padding: 1.3rem 1.5rem 1.5rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
+            border: 1px solid #e2eaf2;
+            transition: 0.15s;
+        }
+
+        .card h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #173a5e;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #eef3f9;
+            padding-bottom: 8px;
+        }
+
+        .card h3 i {
+            color: #3a7bd5;
+            width: 1.6rem;
+            font-size: 1.2rem;
+        }
+
+        .card-content {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #1f3b57;
+            min-height: 70px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .card-content p {
+            margin-top: 4px;
+        }
+
+        .flashcard-item, .plan-item {
+            background: #f6faff;
+            border-radius: 18px;
+            padding: 10px 14px;
+            margin-bottom: 8px;
+            border-left: 4px solid #3a7bd5;
+            font-size: 0.9rem;
+        }
+
+        .flashcard-item strong {
+            color: #0b2b44;
+        }
+
+        .placeholder-text {
+            color: #849bb0;
+            font-style: italic;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #d4e2f7;
+            border-radius: 60px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.2rem 0.9rem;
+            color: #1f4a7a;
+            margin-left: 8px;
+        }
+
+        .footer-note {
+            margin-top: 2.2rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #5d738b;
+            border-top: 1px solid #dde5ef;
+            padding-top: 1.2rem;
+        }
+
+        .footer-note i {
+            color: #3a7bd5;
+            margin: 0 4px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-card">
+    <h1>
+        <i class="fas fa-graduation-cap"></i> StudyMate
+        <span style="font-size: 0.9rem; font-weight: 400; margin-left: auto; background: #dce8f5; padding: 0.2rem 1rem; border-radius: 60px; color: #1f4a7a;">
+            <i class="fas fa-robot"></i> AI assistant
+        </span>
+    </h1>
+    <div class="subhead">
+        <p><i class="fas fa-lightbulb"></i> Upload · paste · learn</p>
+        <p><i class="fas fa-clock"></i> personalized study tools</p>
+    </div>
+
+    <!-- input panel -->
+    <div class="input-panel">
+        <label for="studyInput"><i class="fas fa-pen-fancy"></i> Paste your study material or notes:</label>
+        <textarea id="studyInput" placeholder="Paste your lesson, topic, or any study content here... (e.g. 'Photosynthesis: plants convert light energy into chemical energy...')">Photosynthesis: Plants use sunlight, water, and carbon dioxide to create oxygen and glucose. This process happens in chloroplasts and is vital for life on Earth.</textarea>
+        
+        <div class="file-upload-area">
+            <label style="font-weight: 400; margin-bottom: 0; display: flex; align-items: center; gap: 6px;"><i class="fas fa-upload"></i> Or upload file:</label>
+            <input type="file" id="fileUpload" accept=".txt,.pdf,.doc,.docx">
+            <span style="font-size: 0.8rem; color: #3f6185;"><i class="fas fa-info-circle"></i> .txt, .pdf, .doc</span>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-primary" id="processBtn"><i class="fas fa-magic"></i> Generate study pack</button>
+            <button class="btn btn-outline" id="clearBtn"><i class="fas fa-undo-alt"></i> Clear</button>
+            <button class="btn btn-outline" id="sampleBtn"><i class="fas fa-seedling"></i> Load sample</button>
+        </div>
+    </div>
+
+    <!-- output cards -->
+    <div class="output-grid">
+        <!-- summary card -->
+        <div class="card">
+            <h3><i class="fas fa-compress-alt"></i> Summary</h3>
+            <div id="summaryContent" class="card-content">
+                <span class="placeholder-text">Click "Generate study pack" ✨</span>
+            </div>
+        </div>
+
+        <!-- explanation card -->
+        <div class="card">
+            <h3><i class="fas fa-comment-dots"></i> Simple explanation</h3>
+            <div id="explanationContent" class="card-content">
+                <span class="placeholder-text">Your simplified explanation appears here</span>
+            </div>
+        </div>
+
+        <!-- practice questions card -->
+        <div class="card">
+            <h3><i class="fas fa-question-circle"></i> Practice questions</h3>
+            <div id="questionsContent" class="card-content">
+                <span class="placeholder-text">3 questions to test your knowledge</span>
+            </div>
+        </div>
+
+        <!-- flashcards + study plan combined card (beginner friendly) -->
+        <div class="card">
+            <h3><i class="fas fa-layer-group"></i> Flashcards & plan</h3>
+            <div id="flashPlanContent" class="card-content">
+                <span class="placeholder-text">Flashcards & study plan will appear</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        <i class="fas fa-robot"></i> StudyMate · AI study assistant · simple, fast, effective developed by Siham
+    </div>
+</div>
+
+<script>
+    (function() {
+        "use strict";
+
+        // DOM elements
+        const studyInput = document.getElementById('studyInput');
+        const fileUpload = document.getElementById('fileUpload');
+        const processBtn = document.getElementById('processBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const sampleBtn = document.getElementById('sampleBtn');
+
+        const summaryDiv = document.getElementById('summaryContent');
+        const explanationDiv = document.getElementById('explanationContent');
+        const questionsDiv = document.getElementById('questionsContent');
+        const flashPlanDiv = document.getElementById('flashPlanContent');
+
+        // ---------- helper: generate AI-like responses (beginner level) ----------
+        function generateStudyPack(text) {
+            if (!text || text.trim().length === 0) {
+                return {
+                    summary: '⚠️ No content provided. Please paste or upload some study material.',
+                    explanation: 'Add your notes to get a simple explanation.',
+                    questions: 'Add content to generate practice questions.',
+                    flashPlan: 'No content → no flashcards or plan.'
+                };
+            }
+
+            const clean = text.trim();
+            // 1. summary: first 2-3 sentences or a short digest
+            let summary = '';
+            const sentences = clean.split(/[.!?]+/).filter(s => s.trim().length > 0);
+            if (sentences.length >= 2) {
+                summary = sentences.slice(0, 3).map(s => s.trim() + '.').join(' ');
+                if (summary.length > 200) summary = summary.slice(0, 180) + '…';
+            } else {
+                summary = clean.slice(0, 140) + (clean.length > 140 ? '…' : '');
+            }
+            if (!summary) summary = 'Summary: ' + clean.slice(0, 100);
+
+            // 2. simple explanation: rephrase with plain language
+            let explanation = '';
+            const lower = clean.toLowerCase();
+            if (lower.includes('photosynthesis')) {
+                explanation = '🌱 Photosynthesis is how plants make their own food. They use sunlight, water, and air to create sugar and oxygen. It happens in green parts of the plant.';
+            } else if (lower.includes('algorithm') || lower.includes('code') || lower.includes('programming')) {
+                explanation = '💻 An algorithm is a step-by-step set of instructions to solve a problem. In programming, we write code to tell the computer exactly what to do, step by step.';
+            } else if (lower.includes('cell') && (lower.includes('biology') || lower.includes('membrane'))) {
+                explanation = '🧬 Cells are the basic building blocks of life. Each cell has a membrane, nucleus, and cytoplasm. They work together to keep organisms alive.';
+            } else if (lower.includes('history') || lower.includes('war') || lower.includes('century')) {
+                explanation = '📜 History is the study of past events. By learning history, we understand how societies changed over time and why things are the way they are today.';
+            } else {
+                explanation = '📘 Simple version: ' + clean.slice(0, 120) + '… Try to break down big ideas into smaller parts. Ask yourself "what does this mean in everyday words?"';
+            }
+
+            // 3. practice questions: generate 3 based on keywords
+            let questions = '';
+            const words = clean.split(/\s+/).filter(w => w.length > 4);
+            const topic = words.length > 0 ? words[0] : 'this topic';
+            const q1 = `1. What is the main idea of "${topic}"?`;
+            const q2 = `2. Can you list two key facts about ${topic}?`;
+            const q3 = `3. How does ${topic} relate to real life?`;
+            questions = `${q1}\n${q2}\n${q3}`;
+
+            // 4. flashcards + study plan (combined)
+            let flashPlan = '';
+            const flash1 = `🔹 ${topic}: important concept – try to explain it in your own words.`;
+            const flash2 = `🔹 Key term: ${words.length > 1 ? words[1] : 'definition'} – write a short definition.`;
+            const flash3 = `🔹 Remember: ${sentences.length > 0 ? sentences[0].slice(0, 40) + '…' : 'review main idea'}`;
+            const plan = `📅 Study plan: 1. Read summary (5 min)  2. Review flashcards (5 min)  3. Answer practice questions (10 min)  4. Teach someone (5 min)`;
+            flashPlan = `${flash1}\n${flash2}\n${flash3}\n\n${plan}`;
+
+            return { summary, explanation, questions, flashPlan };
+        }
+
+        // ---------- render content to cards ----------
+        function renderStudyPack(text) {
+            const pack = generateStudyPack(text);
+            summaryDiv.innerHTML = `<p>${pack.summary}</p>`;
+            explanationDiv.innerHTML = `<p>${pack.explanation}</p>`;
+
+            // format questions with line breaks
+            const qLines = pack.questions.split('\n').filter(l => l.trim());
+            let qHtml = '';
+            qLines.forEach(line => {
+                qHtml += `<p style="margin-bottom: 6px;">${line}</p>`;
+            });
+            questionsDiv.innerHTML = qHtml || '<p class="placeholder-text">No questions generated</p>';
+
+            // flashcard & plan: split lines and style
+            const fpLines = pack.flashPlan.split('\n').filter(l => l.trim());
+            let fpHtml = '';
+            fpLines.forEach(line => {
+                if (line.includes('Study plan')) {
+                    fpHtml += `<div style="background: #e4eefa; border-radius: 20px; padding: 8px 14px; margin-top: 8px; font-weight: 500;">📌 ${line}</div>`;
+                } else {
+                    fpHtml += `<div class="flashcard-item">${line}</div>`;
+                }
+            });
+            flashPlanDiv.innerHTML = fpHtml || '<span class="placeholder-text">Flashcards + plan ready</span>';
+        }
+
+        // ---------- read file content (beginner friendly) ----------
+        function readFileContent(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = (e) => reject('Error reading file');
+                // for simplicity, read as text (works for .txt, .pdf will show raw)
+                reader.readAsText(file);
+            });
+        }
+
+        // ---------- process input (text + file) ----------
+        async function processInput() {
+            let text = studyInput.value;
+            // if file selected, read and append/prepend? We'll replace content for simplicity.
+            if (fileUpload.files && fileUpload.files.length > 0) {
+                try {
+                    const file = fileUpload.files[0];
+                    const fileText = await readFileContent(file);
+                    if (fileText && fileText.trim()) {
+                        // combine: file content takes priority, but we can merge
+                        text = fileText.trim() + '\n\n' + (text ? text : '');
+                        studyInput.value = text; // show combined in textarea
+                    }
+                } catch (err) {
+                    alert('Could not read file. Please make sure it is a text-based file.');
+                }
+            }
+            if (!text || text.trim().length === 0) {
+                alert('Please enter some study material or upload a file.');
+                return;
+            }
+            renderStudyPack(text);
+        }
+
+        // ---------- clear all ----------
+        function clearAll() {
+            studyInput.value = '';
+            fileUpload.value = '';
+            summaryDiv.innerHTML = `<span class="placeholder-text">Click "Generate study pack" ✨</span>`;
+            explanationDiv.innerHTML = `<span class="placeholder-text">Your simplified explanation appears here</span>`;
+            questionsDiv.innerHTML = `<span class="placeholder-text">3 questions to test your knowledge</span>`;
+            flashPlanDiv.innerHTML = `<span class="placeholder-text">Flashcards & study plan will appear</span>`;
+        }
+
+        // ---------- load sample (photosynthesis) ----------
+        function loadSample() {
+            const sampleText = `Photosynthesis: Plants use sunlight, water, and carbon dioxide to create oxygen and glucose. This process happens in chloroplasts and is vital for life on Earth.`;
+            studyInput.value = sampleText;
+            renderStudyPack(sampleText);
+        }
+
+        // ---------- event listeners ----------
+        processBtn.addEventListener('click', processInput);
+        clearBtn.addEventListener('click', clearAll);
+        sampleBtn.addEventListener('click', loadSample);
+
+        // optional: if user presses enter on file input? no.
+
+        // initial auto-load sample for demonstration (first visit)
+        window.addEventListener('load', function() {
+            // if textarea is empty, load sample
+            if (!studyInput.value.trim()) {
+                loadSample();
+            } else {
+                // if there is default text, render it
+                renderStudyPack(studyInput.value);
+            }
+        });
+
+    })();
+</script>
+</body>
+</html>
